@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="th" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Piaggio Medley 150 - PGQ16 Web Monitor</title>
-  
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PGQ16 Sport Arc - Piaggio Medley 150</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -13,1000 +12,1376 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              red: '#FF2E54',
-              cyan: '#00F0FF',
-              amber: '#FFB800',
-              green: '#00E676',
-              dark: '#0B0F17',
-              card: '#151C28',
-              cardBorder: '#2A364F'
-            }
+            obsidian: '#0B0E14',
+            darkcard: '#141923',
+            daybg: '#F1F5F9',
+            daycard: '#FFFFFF',
+            neoncyan: '#00F0FF',
+            neongreen: '#00FF66',
+            neonamber: '#FFB800',
+            neonred: '#FF2A6D'
           },
           fontFamily: {
-            sans: ['Prompt', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            display: ['Inter', 'sans-serif']
+            sans: ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
           }
         }
       }
     }
   </script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <style>
-    /* Custom Scrollbar & Touch Optimization */
-    * {
-      -webkit-tap-highlight-color: transparent;
+    /* Prevent accidental double-tap zoom & text selection during ride */
+    body {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
       user-select: none;
+      touch-action: manipulation;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
+    .arc-glow {
+      filter: drop-shadow(0px 0px 8px currentColor);
     }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
     }
-
-    /* Pulsing & Animations */
-    @keyframes pulse-red {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.02); }
-    }
-    .animate-pulse-dtc {
-      animation: pulse-red 1.2s infinite ease-in-out;
-    }
-
-    /* Gauge Arc Smooth Stroke */
-    .gauge-arc-bg {
-      stroke: rgba(255, 255, 255, 0.08);
-      stroke-linecap: round;
-    }
-    .gauge-arc-fill {
-      transition: stroke-dashoffset 0.25s ease-out, stroke 0.3s ease;
-      stroke-linecap: round;
-    }
-
-    /* Horizontal Segment Bar */
-    .segmented-bar {
-      background: linear-gradient(90deg, 
-        #00E676 0%, #00E676 60%, 
-        #FFB800 60%, #FFB800 85%, 
-        #FF2E54 85%, #FF2E54 100%);
-    }
-
-    /* Glossy Mirror Effect for Italian Cluster */
-    .glass-panel {
-      background: rgba(21, 28, 40, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Dynamic Island Notch Frame */
-    .dynamic-island {
-      width: 110px;
-      height: 28px;
-      background-color: #000;
-      border-radius: 20px;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-      box-shadow: 0 0 4px rgba(0,0,0,0.8);
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-gray-950 text-slate-100 min-h-screen font-sans flex flex-col items-center justify-start p-2 sm:p-4 md:p-6 overflow-x-hidden">
+<body class="bg-daybg text-slate-900 dark:bg-obsidian dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-  <!-- TOP CONTROL BAR (OUTSIDE MOBILE CONTAINER) -->
-  <header class="w-full max-w-4xl mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl backdrop-blur">
-    <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
-      
-      <!-- Title & Vehicle Badging -->
-      <div class="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-8 bg-brand-cyan rounded-full"></div>
-          <div>
-            <h1 class="text-base sm:text-lg font-bold text-white tracking-wide">Piaggio Medley 150 <span class="text-xs font-normal text-brand-cyan bg-brand-cyan/10 px-2 py-0.5 rounded border border-brand-cyan/30">PGQ16 ECU</span></h1>
-            <p class="text-xs text-slate-400">Web Bluetooth OBD2 Telemetry Monitor</p>
-          </div>
-        </div>
-        <div class="lg:hidden text-right">
-          <span id="top-conn-badge" class="text-xs px-2.5 py-1 rounded-full font-mono bg-amber-500/10 text-amber-400 border border-amber-500/30">SIMULATOR</span>
-        </div>
-      </div>
-
-      <!-- Theme Switcher Buttons -->
-      <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-2">
-        <span class="text-xs text-slate-400 self-start sm:self-center font-medium">ธีมหน้าหลัก:</span>
-        <div class="grid grid-cols-3 gap-1.5 w-full sm:w-auto bg-slate-950 p-1 rounded-xl border border-slate-800">
-          <button onclick="setTheme(1)" id="btn-theme-1" class="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all text-white bg-slate-800 shadow">
-            แบบ 1: Sport Arc
-          </button>
-          <button onclick="setTheme(2)" id="btn-theme-2" class="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white">
-            แบบ 2: Rider HUD
-          </button>
-          <button onclick="setTheme(3)" id="btn-theme-3" class="px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white">
-            แบบ 3: Italian
-          </button>
-        </div>
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-darkcard/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-slate-400" id="statusDot"></div>
+      <div>
+        <h1 class="text-base font-bold tracking-tight leading-none text-slate-900 dark:text-white flex items-center gap-1.5">
+          <span>PGQ16 Sport Arc</span>
+          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">Medley 150</span>
+        </h1>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" id="statusText">พร้อมเชื่อมต่อ BLE</p>
       </div>
     </div>
 
-    <!-- Scenario Simulator Controls -->
-    <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>ทดสอบสภาวะจำลอง (Scenario Simulator):</span>
+    <div class="flex items-center space-x-2">
+      <!-- REC Indicator Pill -->
+      <div id="recBadge" class="hidden items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-[11px] font-bold animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+        <span>REC</span>
       </div>
-      <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-        <button onclick="setScenario('idle')" id="scen-idle" class="flex-1 sm:flex-none px-3 py-1.5 text-xs rounded-lg font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition">
-          🟢 เดินเบาปกติ
-        </button>
-        <button onclick="setScenario('riding')" id="scen-riding" class="flex-1 sm:flex-none px-3 py-1.5 text-xs rounded-lg font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition">
-          🔵 กำลังขี่ (68km/h)
-        </button>
-        <button onclick="setScenario('fault')" id="scen-fault" class="flex-1 sm:flex-none px-3 py-1.5 text-xs rounded-lg font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 transition">
-          🔴 รอบค้าง / P0505
-        </button>
-      </div>
+
+      <!-- Theme Switcher Button (Auto/Light/Dark) -->
+      <button id="themeToggleBtn" onclick="cycleTheme()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+        <span id="themeIcon">🌓</span>
+        <span id="themeLabel">Auto</span>
+      </button>
+
+      <!-- Connect BLE Button -->
+      <button id="bleBtn" onclick="toggleBLE()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold shadow-md hover:opacity-90 active:scale-95 transition flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span id="bleBtnText">เชื่อมต่อ BLE</span>
+      </button>
     </div>
   </header>
 
-  <!-- IPHONE 15 VIEWPORT CONTAINER -->
-  <main class="relative w-full max-w-[393px] h-[835px] bg-brand-dark rounded-[48px] border-[8px] border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col justify-between select-none">
-    
-    <!-- iPhone Dynamic Island -->
-    <div class="dynamic-island flex items-center justify-end px-3">
-      <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-700"></div>
-    </div>
+  <!-- MAIN NAVIGATION TABS -->
+  <nav class="bg-slate-100 dark:bg-slate-900/60 p-1 mx-4 mt-3 rounded-xl flex border border-slate-200 dark:border-slate-800/80">
+    <button id="tab1Btn" onclick="switchTab(1)" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center bg-white dark:bg-darkcard text-cyan-600 dark:text-neoncyan shadow-sm">
+      หน้าหลัก (Sport Arc)
+    </button>
+    <button id="tab2Btn" onclick="switchTab(2)" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+      ข้อมูลเชิงลึก & ควบคุม
+    </button>
+  </nav>
 
-    <!-- APP TOP STATUS BAR inside iPhone -->
-    <div class="pt-10 px-5 pb-2 bg-gradient-to-b from-slate-950/90 to-transparent flex items-center justify-between text-xs z-20">
-      <div class="flex items-center gap-1.5">
-        <span id="ble-status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span id="ble-status-text" class="font-mono text-[11px] text-slate-300 tracking-tight">ELM327 BLE • PGQ16</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div id="rec-indicator" class="hidden flex items-center gap-1 bg-rose-500/20 border border-rose-500/40 text-rose-400 px-2 py-0.5 rounded-full font-mono text-[10px] animate-pulse">
-          <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-          <span id="rec-count">REC 0</span>
-        </div>
-        <span class="font-mono text-[10px] text-slate-400" id="clock-display">12:45</span>
-      </div>
-    </div>
+  <!-- TAB CONTENT CONTAINER (SWIPEABLE) -->
+  <main class="flex-1 px-4 py-3 max-w-md mx-auto w-full space-y-4 overflow-x-hidden" id="swipeArea">
 
-    <!-- SWIPEABLE PAGE SLIDER CONTAINER -->
-    <div id="app-viewport" class="flex-1 overflow-x-auto overflow-y-hidden snap-x snap-mandatory flex no-scrollbar transition-all scroll-smooth">
+    <!-- PAGE 1: SPORT ARC DASHBOARD -->
+    <div id="page1" class="space-y-4 transition-opacity duration-200">
       
-      <!-- ========================================== -->
-      <!-- PAGE 1: RIDE DASHBOARD (ONLY 6 PARAMETERS) -->
-      <!-- ========================================== -->
-      <section id="page-1" class="w-full flex-shrink-0 snap-start h-full flex flex-col px-4 pt-1 pb-2 overflow-y-auto no-scrollbar">
+      <!-- HERO SPORT ARC GAUGE -->
+      <div class="relative bg-white dark:bg-darkcard rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 text-center flex flex-col items-center justify-center min-h-[290px]">
         
-        <!-- STYLE 1: SPORT ARC (เกจโค้งสปอร์ต) -->
-        <div id="style-1-container" class="flex-1 flex flex-col justify-between py-1">
-          
-          <!-- Arc Tachometer & Speed Center -->
-          <div class="relative w-full aspect-square max-h-[270px] mx-auto flex items-center justify-center">
-            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
-              <!-- Background Track -->
-              <circle cx="100" cy="100" r="82" fill="none" stroke-width="14" class="gauge-arc-bg" stroke-dasharray="386.4" stroke-dashoffset="100"/>
-              <!-- Redline Indicator Zone -->
-              <circle cx="100" cy="100" r="82" fill="none" stroke="#FF2E54" stroke-opacity="0.3" stroke-width="14" stroke-dasharray="386.4" stroke-dashoffset="330" stroke-linecap="round"/>
-              <!-- Dynamic Filled Arc -->
-              <circle id="arc-fill" cx="100" cy="100" r="82" fill="none" stroke="#00F0FF" stroke-width="14" class="gauge-arc-fill" stroke-dasharray="386.4" stroke-dashoffset="260"/>
-            </svg>
+        <!-- SVG ARC GAUGE -->
+        <div class="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+            <!-- Background Track -->
+            <path d="M 30 100 A 70 70 0 1 1 170 100" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" class="text-slate-100 dark:text-slate-800"/>
+            <!-- Idle Zone Indicator Track (1350-1750 RPM) -->
+            <path d="M 46.5 60.5 A 70 70 0 0 1 65 43" fill="none" stroke="currentColor" stroke-width="14" class="text-emerald-500/20 dark:text-emerald-500/30"/>
+            <!-- Dynamic Filled Gauge Track -->
+            <path id="rpmArcPath" d="M 30 100 A 70 70 0 1 1 170 100" fill="none" stroke="#00F0FF" stroke-width="14" stroke-linecap="round" stroke-dasharray="330" stroke-dashoffset="330" class="transition-all duration-300 arc-glow"/>
+          </svg>
 
-            <!-- Centered Speedometer & RPM Inside Gauge -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">SPEED</span>
-              <div class="flex items-baseline justify-center font-mono leading-none my-0.5">
-                <span id="s1-speed" class="text-6xl font-extrabold text-white tracking-tighter">0</span>
-                <span class="text-xs text-brand-cyan font-sans ml-1">km/h</span>
-              </div>
-              <div class="mt-1 px-3 py-0.5 rounded-full bg-slate-900/80 border border-slate-700/60 flex items-center gap-1.5">
-                <span class="text-[10px] text-slate-400">RPM:</span>
-                <span id="s1-rpm" class="font-mono text-sm font-bold text-brand-cyan">1550</span>
-              </div>
+          <!-- CENTERED READOUT (RPM & SPEED) -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center pt-2">
+            <!-- Speed Display -->
+            <div class="flex items-baseline justify-center font-extrabold tracking-tight">
+              <span id="speedVal" class="text-5xl text-slate-900 dark:text-white font-black leading-none">0</span>
+              <span class="text-xs font-bold text-slate-400 ml-1">km/h</span>
             </div>
-          </div>
 
-          <!-- Dual Progress Cards: TPS % & IACV -->
-          <div class="grid grid-cols-2 gap-2 my-2">
-            <!-- TPS Card -->
-            <div class="bg-brand-card/90 border border-brand-cardBorder rounded-2xl p-3 flex flex-col justify-between">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] text-slate-400 font-medium">ลิ้นผีเสื้อ (TPS)</span>
-                <span class="text-[9px] font-mono text-slate-500">0145</span>
+            <!-- RPM Display -->
+            <div class="mt-2 flex flex-col items-center">
+              <div class="flex items-baseline gap-1">
+                <span id="rpmVal" class="text-3xl font-black text-cyan-600 dark:text-neoncyan tracking-tight">0</span>
+                <span class="text-[11px] font-bold text-slate-400">RPM</span>
               </div>
-              <div class="my-1.5">
-                <span id="s1-tps" class="text-2xl font-bold font-mono text-white">0.0</span>
-                <span class="text-xs text-slate-400">%</span>
-              </div>
-              <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                <div id="s1-tps-bar" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+              <div id="rpmBadge" class="mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                OFFLINE
               </div>
             </div>
-
-            <!-- IACV Card -->
-            <div class="bg-brand-card/90 border border-brand-cardBorder rounded-2xl p-3 flex flex-col justify-between">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] text-slate-400 font-medium">วาล์วเดินเบา (IACV)</span>
-                <span class="text-[9px] font-mono text-slate-500">2121</span>
-              </div>
-              <div class="my-1.5">
-                <span id="s1-iacv" class="text-2xl font-bold font-mono text-emerald-400">24</span>
-                <span class="text-xs text-slate-400">steps</span>
-              </div>
-              <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                <div id="s1-iacv-bar" class="bg-emerald-400 h-full rounded-full transition-all duration-300" style="width: 24%"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Badges: RISS & P-Code DTC -->
-          <div class="space-y-2">
-            <!-- RISS Status Pill -->
-            <div id="s1-riss-box" class="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-2.5 flex items-center justify-between transition-all">
-              <div class="flex items-center gap-2">
-                <div id="s1-riss-dot" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
-                <div>
-                  <div class="text-[10px] text-slate-400">สถานะดับเครื่องอัตโนมัติ (RISS)</div>
-                  <div id="s1-riss-text" class="text-xs font-bold text-emerald-300">RDY • สแตนด์บายพร้อมดับเครื่อง</div>
-                </div>
-              </div>
-              <span id="s1-riss-code" class="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">212B</span>
-            </div>
-
-            <!-- DTC Code Pill -->
-            <div id="s1-dtc-box" class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between transition-all">
-              <div class="flex items-center gap-2">
-                <div id="s1-dtc-icon" class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">✓</div>
-                <div>
-                  <div class="text-[10px] text-slate-400">รหัสไฟเครื่องยนต์ (DTC Code)</div>
-                  <div id="s1-dtc-text" class="text-xs font-bold text-emerald-400">NONE • ระบบปกติ ไม่พบความผิดปกติ</div>
-                </div>
-              </div>
-              <span id="s1-dtc-pid" class="text-[10px] font-mono text-slate-500">1800FF00</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- STYLE 2: RIDER HUD (ตัวเลขใหญ่ อ่านง่าย High-Contrast Bento) -->
-        <div id="style-2-container" class="hidden flex-1 flex-col justify-between py-1">
-          
-          <!-- Top Huge Dual Metrics: SPEED & RPM -->
-          <div class="grid grid-cols-1 gap-2.5">
-            <!-- Speed Massive Block -->
-            <div class="bg-black border-2 border-slate-800 rounded-3xl p-4 flex items-center justify-between shadow-2xl">
-              <div>
-                <div class="text-xs font-bold text-slate-400 tracking-wider">ความเร็ว (SPEED)</div>
-                <div class="flex items-baseline">
-                  <span id="s2-speed" class="text-7xl font-black font-mono text-yellow-400 tracking-tighter">0</span>
-                  <span class="text-base font-bold text-slate-400 ml-2">KM/H</span>
-                </div>
-              </div>
-              <div class="w-16 h-16 rounded-2xl bg-yellow-400/10 border border-yellow-400/30 flex flex-col items-center justify-center">
-                <span class="text-[10px] text-yellow-400 font-bold">PID</span>
-                <span class="font-mono text-xs text-yellow-300">010D</span>
-              </div>
-            </div>
-
-            <!-- RPM Massive Block -->
-            <div class="bg-slate-900 border-2 border-slate-800 rounded-3xl p-4 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-bold text-slate-400 tracking-wider">รอบเครื่องยนต์ (RPM)</div>
-                <div class="flex items-baseline">
-                  <span id="s2-rpm" class="text-5xl font-black font-mono text-cyan-400 tracking-tight">1550</span>
-                  <span class="text-sm font-bold text-slate-400 ml-2">RPM</span>
-                </div>
-              </div>
-              <!-- Mini Segmented Bar -->
-              <div class="w-24 h-4 bg-slate-950 rounded-full border border-slate-800 overflow-hidden">
-                <div id="s2-rpm-bar" class="h-full bg-cyan-400 transition-all duration-200" style="width: 15%"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Middle Sub Tiles: TPS & IACV -->
-          <div class="grid grid-cols-2 gap-2.5 my-2">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">ลิ้นผีเสื้อ TPS %</span>
-              <div id="s2-tps" class="text-3xl font-extrabold font-mono text-white my-1">0.0%</div>
-              <div class="text-[9px] text-slate-500 font-mono">PID 0145</div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">วาล์ว IACV</span>
-              <div id="s2-iacv" class="text-3xl font-extrabold font-mono text-emerald-400 my-1">24</div>
-              <div class="text-[9px] text-slate-500 font-mono">PID 2121</div>
-            </div>
-          </div>
-
-          <!-- Bottom Full Width Banners: RISS & DTC -->
-          <div class="space-y-2">
-            <div id="s2-riss-box" class="bg-emerald-500/10 border-2 border-emerald-500 rounded-2xl p-3 flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-300">ระบบ RISS</span>
-              <span id="s2-riss-text" class="text-sm font-black font-mono text-emerald-400">RDY (พร้อมทำงาน)</span>
-            </div>
-
-            <div id="s2-dtc-box" class="bg-slate-900 border-2 border-slate-800 rounded-2xl p-3 flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-300">รหัสความผิดปกติ DTC</span>
-              <span id="s2-dtc-text" class="text-sm font-black font-mono text-emerald-400">NO ERROR</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- STYLE 3: ITALIAN CLUSTER (เรือนไมล์ TFT ดิจิทัลทรงอิตาเลียน) -->
-        <div id="style-3-container" class="hidden flex-1 flex-col justify-between py-1">
-          
-          <!-- Top Horizontal Curved/Segmented RPM Graph -->
-          <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-3.5 shadow-lg">
-            <div class="flex items-center justify-between mb-1.5 text-xs">
-              <span class="font-bold text-slate-300 tracking-wider">TACHOMETER</span>
-              <span id="s3-rpm-num" class="font-mono font-bold text-brand-cyan text-sm">1550 RPM</span>
-            </div>
-            
-            <!-- Segmented RPM Gauge Bar -->
-            <div class="w-full bg-slate-950 h-5 rounded-xl border border-slate-800 p-0.5 relative overflow-hidden">
-              <div id="s3-rpm-bar" class="h-full rounded-lg segmented-bar transition-all duration-300" style="width: 15%"></div>
-            </div>
-            <div class="flex justify-between text-[9px] font-mono text-slate-500 px-1 mt-1">
-              <span>0</span>
-              <span>3k</span>
-              <span>6k</span>
-              <span>9k</span>
-              <span class="text-rose-500">11k</span>
-            </div>
-          </div>
-
-          <!-- Main Centerpiece: Italica Speedometer -->
-          <div class="my-3 glass-panel rounded-3xl p-5 text-center relative overflow-hidden border border-slate-700/50 shadow-2xl">
-            <div class="text-[10px] uppercase font-bold tracking-widest text-slate-400">PIAGGIO DIGITAL SPEED</div>
-            <div class="my-1 flex items-center justify-center">
-              <span id="s3-speed" class="text-7xl font-black italic font-mono text-white drop-shadow-[0_4px_12px_rgba(0,240,255,0.3)]">0</span>
-            </div>
-            <span class="text-xs font-semibold text-brand-cyan tracking-wider">KILOMETERS PER HOUR</span>
-          </div>
-
-          <!-- Sub Cards: TPS & IACV -->
-          <div class="grid grid-cols-2 gap-2.5 mb-2">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
-              <div class="text-[10px] text-slate-400">THROTTLE POSITION</div>
-              <div class="flex items-baseline gap-1 my-0.5">
-                <span id="s3-tps" class="text-2xl font-bold font-mono text-white">0.0</span>
-                <span class="text-xs text-slate-400">%</span>
-              </div>
-              <div class="text-[9px] text-slate-500 font-mono">PID: 0145</div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
-              <div class="text-[10px] text-slate-400">IACV STEPER VALVE</div>
-              <div class="flex items-baseline gap-1 my-0.5">
-                <span id="s3-iacv" class="text-2xl font-bold font-mono text-emerald-400">24</span>
-                <span class="text-xs text-slate-400">POS</span>
-              </div>
-              <div class="text-[9px] text-slate-500 font-mono">PID: 2121</div>
-            </div>
-          </div>
-
-          <!-- Bottom Warning Cluster Badges -->
-          <div class="grid grid-cols-2 gap-2">
-            <div id="s3-riss-badge" class="bg-emerald-950/60 border border-emerald-500/50 rounded-xl p-2.5 flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">A</div>
-              <div class="overflow-hidden">
-                <div class="text-[9px] text-slate-400">RISS SYSTEM</div>
-                <div id="s3-riss-text" class="text-xs font-bold text-emerald-300 truncate">READY</div>
-              </div>
-            </div>
-
-            <div id="s3-dtc-badge" class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center gap-2">
-              <div id="s3-dtc-icon" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">OK</div>
-              <div class="overflow-hidden">
-                <div class="text-[9px] text-slate-400">CHECK ENGINE</div>
-                <div id="s3-dtc-text" class="text-xs font-bold text-emerald-400 truncate">NO P-CODE</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- ========================================== -->
-      <!-- PAGE 2: DEEP TELEMETRY & CONTROL BUTTONS   -->
-      <!-- ========================================== -->
-      <section id="page-2" class="w-full flex-shrink-0 snap-start h-full flex flex-col px-4 pt-1 pb-2 overflow-y-auto no-scrollbar">
-        
-        <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
-          <div>
-            <h2 class="text-sm font-bold text-white">ข้อมูลเชิงลึก & ปุ่มสั่งงาน</h2>
-            <p class="text-[10px] text-slate-400">Piaggio PGQ16 Extended PIDs & ECU Commands</p>
-          </div>
-          <span class="text-[10px] font-mono bg-brand-cardBorder text-slate-300 px-2 py-0.5 rounded">PAGE 2/2</span>
-        </div>
-
-        <!-- 2-Column Telemetry Grid -->
-        <div class="grid grid-cols-2 gap-2 mb-4">
-          
-          <!-- Bat Voltage (2104) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>แรงดันแบตเตอรี่</span>
-              <span class="font-mono text-slate-500">2104</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-white mt-0.5" id="p2-volt">14.2 V</div>
-          </div>
-
-          <!-- ECT Temp (0105) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>อุณหภูมิน้ำ ECT</span>
-              <span class="font-mono text-slate-500">0105</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-cyan-400 mt-0.5" id="p2-ect">88 °C</div>
-          </div>
-
-          <!-- IACV Adapt (2120) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>IACV Adapt</span>
-              <span class="font-mono text-slate-500">2120</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-emerald-400 mt-0.5" id="p2-iacv-adapt">129 (+1)</div>
-          </div>
-
-          <!-- IACV Target (211F) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>IACV Target</span>
-              <span class="font-mono text-slate-500">211F</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-slate-200 mt-0.5" id="p2-iacv-target">64 steps</div>
-          </div>
-
-          <!-- Ignition Angle (2109) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>องศาจุดระเบิด</span>
-              <span class="font-mono text-slate-500">2109</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-yellow-400 mt-0.5" id="p2-ign">12.5°</div>
-          </div>
-
-          <!-- Injection Time (2108) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>ระยะเวลาหัวฉีด</span>
-              <span class="font-mono text-slate-500">2108</span>
-            </div>
-            <div class="text-lg font-bold font-mono text-purple-400 mt-0.5" id="p2-inj">2.4 ms</div>
-          </div>
-
-          <!-- Brake Switch (212F) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>สวิตช์เบรก</span>
-              <span class="font-mono text-slate-500">212F</span>
-            </div>
-            <div class="text-sm font-bold text-slate-200 mt-1" id="p2-brake">ปล่อย (OFF)</div>
-          </div>
-
-          <!-- Idle Switch Flag (2127) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>Idle Flag</span>
-              <span class="font-mono text-slate-500">2127</span>
-            </div>
-            <div class="text-sm font-bold font-mono text-emerald-400 mt-1" id="p2-idle-flag">01 (ลิ้นปิดสุด)</div>
-          </div>
-
-          <!-- IACV Driver Circuit (2119) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>ไดรเวอร์ IACV</span>
-              <span class="font-mono text-slate-500">2119</span>
-            </div>
-            <div class="text-sm font-bold font-mono text-emerald-400 mt-1" id="p2-iacv-drv">08 (ปกติ)</div>
-          </div>
-
-          <!-- ECU Engine Mode (2135) -->
-          <div class="bg-brand-card/80 border border-brand-cardBorder rounded-xl p-2.5">
-            <div class="flex justify-between items-center text-[10px] text-slate-400">
-              <span>โหมดเครื่องยนต์</span>
-              <span class="font-mono text-slate-500">2135</span>
-            </div>
-            <div class="text-sm font-bold font-mono text-brand-cyan mt-1" id="p2-mode">08 (Engine Run)</div>
-          </div>
-
-        </div>
-
-        <!-- CONTROL BUTTONS PANEL -->
-        <div class="mt-auto pt-2 border-t border-slate-800 space-y-2">
-          <div class="text-xs font-bold text-slate-300">การเชื่อมต่อ & คำสั่ง ECU</div>
-          
-          <div class="grid grid-cols-2 gap-2">
-            <!-- Bluetooth Toggle Button -->
-            <button onclick="toggleBluetoothConnection()" id="btn-ble-connect" class="w-full py-2.5 px-3 bg-brand-cyan/20 border border-brand-cyan/50 text-brand-cyan hover:bg-brand-cyan/30 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              <span id="btn-ble-text">เชื่อมต่อ ELM327 BLE</span>
-            </button>
-
-            <!-- CSV Log Record Toggle -->
-            <button onclick="toggleCSVRecord()" id="btn-log-record" class="w-full py-2.5 px-3 bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition">
-              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-              <span id="btn-log-text">บันทึก Log (CSV)</span>
-            </button>
-          </div>
-
-          <!-- Special ECU Commands -->
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <!-- Reset Adapt Button -->
-            <button onclick="openModal('reset-adapt')" class="w-full py-2.5 px-3 bg-blue-600/20 border border-blue-500/50 text-blue-400 hover:bg-blue-600/30 rounded-xl font-bold text-xs transition">
-              🔄 RESET ADAPT (300200)
-            </button>
-
-            <!-- Clear DTC Button -->
-            <button onclick="openModal('clear-dtc')" class="w-full py-2.5 px-3 bg-rose-600/20 border border-rose-500/50 text-rose-400 hover:bg-rose-600/30 rounded-xl font-bold text-xs transition">
-              🧹 CLEAR DTC (14FF00)
-            </button>
           </div>
         </div>
 
-      </section>
-
-    </div>
-
-    <!-- BOTTOM APP NAVIGATION TABS (PAGE SWITCHER) -->
-    <div class="bg-slate-950/95 border-t border-slate-800/80 px-4 py-2.5 flex items-center justify-center z-20">
-      <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-full border border-slate-800">
-        <button onclick="scrollToPage(1)" id="tab-page-1" class="px-4 py-1.5 rounded-full text-xs font-medium text-white bg-brand-cyan/20 border border-brand-cyan/40 shadow transition">
-          หน้าหลัก
-        </button>
-        <button onclick="scrollToPage(2)" id="tab-page-2" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition">
-          ข้อมูลลึก & ปุ่มสั่งงาน
-        </button>
+        <!-- ARC FOOTER METRICS -->
+        <div class="w-full grid grid-cols-2 gap-2 mt-1 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+          <div class="text-left px-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ความร้อนเครื่อง (ECT)</span>
+            <div class="flex items-baseline space-x-1">
+              <span id="ectValMain" class="text-lg font-extrabold text-slate-800 dark:text-slate-100">--</span>
+              <span class="text-xs font-bold text-slate-400">°C</span>
+            </div>
+          </div>
+          <div class="text-right px-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">องศาจุดระเบิด (IGN)</span>
+            <div class="flex items-baseline justify-end space-x-1">
+              <span id="ignValMain" class="text-lg font-extrabold text-slate-800 dark:text-slate-100">--</span>
+              <span class="text-xs font-bold text-slate-400">°</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- PROGRESS BAR CARDS (TPS & IACV OUT) -->
+      <div class="grid grid-cols-1 gap-3">
+        <!-- Throttle Opening Card -->
+        <div class="bg-white dark:bg-darkcard p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1.5">
+          <div class="flex justify-between items-center text-xs font-bold">
+            <span class="text-slate-500 dark:text-slate-400">ลิ้นเร่ง (Rel TPS)</span>
+            <span id="tpsVal" class="text-slate-900 dark:text-white font-extrabold text-sm">0 %</span>
+          </div>
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div id="tpsBar" class="bg-cyan-500 dark:bg-neoncyan h-full w-0% transition-all duration-200 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- IACV Out Card -->
+        <div class="bg-white dark:bg-darkcard p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1.5">
+          <div class="flex justify-between items-center text-xs font-bold">
+            <span class="text-slate-500 dark:text-slate-400">วาล์วเดินเบา (IACV Out)</span>
+            <span id="iacvOutVal" class="text-slate-900 dark:text-white font-extrabold text-sm">0 (0x00)</span>
+          </div>
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div id="iacvOutBar" class="bg-indigo-500 dark:bg-indigo-400 h-full w-0% transition-all duration-200 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEDICATED METRIC CARDS (BATTERY VOLTAGE & IACV ADAPT) -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Battery Voltage Card -->
+        <div class="bg-white dark:bg-darkcard p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">แรงดันแบตเตอรี่</span>
+            <span id="battDot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+          </div>
+          <div class="mt-1 flex items-baseline space-x-1">
+            <span id="battVal" class="text-2xl font-black text-slate-900 dark:text-white">--</span>
+            <span class="text-xs font-bold text-slate-400">V</span>
+          </div>
+          <p id="battSubText" class="text-[10px] font-medium text-slate-400 mt-0.5">รอข้อมูล ECU</p>
+        </div>
+
+        <!-- IACV Adapt Card -->
+        <div class="bg-white dark:bg-darkcard p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">IACV Adapt (2120)</span>
+            <span id="adaptDot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+          </div>
+          <div class="mt-1 flex items-baseline space-x-1">
+            <span id="adaptVal" class="text-2xl font-black text-slate-900 dark:text-white">--</span>
+          </div>
+          <p id="adaptSubText" class="text-[10px] font-medium text-slate-400 mt-0.5">ค่าปกติ ~128 (+0)</p>
+        </div>
+      </div>
+
+      <!-- BOTTOM STATUS PILL BADGES (RISS & DTC) -->
+      <div class="grid grid-cols-2 gap-3 pt-1">
+        <!-- RISS Status Badge -->
+        <div id="rissBadgeBox" class="bg-white dark:bg-darkcard p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-2.5">
+          <div id="rissIconBg" class="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
+            OFF
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] font-bold text-slate-400 block uppercase">ระบบดับเครื่องดับเบา</span>
+            <span id="rissText" class="text-xs font-extrabold text-slate-700 dark:text-slate-200 truncate block">RISS: UNKNOWN</span>
+          </div>
+        </div>
+
+        <!-- DTC Status Badge -->
+        <div id="dtcBadgeBox" class="bg-white dark:bg-darkcard p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-2.5">
+          <div id="dtcIconBg" class="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-xs shrink-0">
+            OK
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] font-bold text-slate-400 block uppercase">การตรวจรหัสข้อผิดพลาด</span>
+            <span id="dtcText" class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 truncate block">DTC: NONE (OK)</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
+    <!-- PAGE 2: DEEP TELEMETRY, CONTROLS & LOGGER -->
+    <div id="page2" class="hidden space-y-4 transition-opacity duration-200">
+      
+      <!-- TELEMETRY GRID -->
+      <div class="bg-white dark:bg-darkcard rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+          <span>พารามิเตอร์เชิงลึก ECU (PGQ16 Live)</span>
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        </h2>
+        
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <!-- ECT -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">ECT Coolant</span>
+            <span id="t2_ect" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">-- °C</span>
+          </div>
+
+          <!-- IACV Target -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">IACV Target (211F)</span>
+            <span id="t2_iacvTgt" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- Ignition Advance -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">Ignition Adv (2109)</span>
+            <span id="t2_ign" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">-- °</span>
+          </div>
+
+          <!-- Inj Time / O2 -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">Inj Pulse (2108)</span>
+            <span id="t2_inj" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">-- ms</span>
+          </div>
+
+          <!-- Throttle Idle Flag -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">TPS Idle Switch (2127)</span>
+            <span id="t2_tpsSw" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- RISS Master State -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">RISS State (212B)</span>
+            <span id="t2_rissState" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- RISS Handlebar Switch -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">สวิตช์แฮนด์ RISS (2130)</span>
+            <span id="t2_rissSw" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- Brake Switch -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">สวิตช์เบรก (212F)</span>
+            <span id="t2_brakeSw" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- Engine Mode -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">โหมดเครื่องยนต์ (2135)</span>
+            <span id="t2_engMode" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+
+          <!-- IACV Driver Flag -->
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-semibold text-slate-400 block">สถานะไดรเวอร์ IACV (2119)</span>
+            <span id="t2_drvErr" class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ECU CONTROLS (RESET ADAPT & CLEAR DTC) -->
+      <div class="bg-white dark:bg-darkcard rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">คำสั่งควบคุมกล่อง ECU (Commands)</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="promptResetAdapt()" class="px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex flex-col items-center text-center">
+            <span class="text-sm">🔄 RESET ADAPT</span>
+            <span class="text-[10px] font-medium opacity-80 mt-0.5">ล้างค่าเรียนรู้รอบเดินเบา (300200)</span>
+          </button>
+          
+          <button onclick="promptClearDTC()" class="px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-bold text-xs hover:bg-red-500/20 active:scale-95 transition flex flex-col items-center text-center">
+            <span class="text-sm">🧹 CLEAR DTC</span>
+            <span class="text-[10px] font-medium opacity-80 mt-0.5">ลบล้างรหัสโค้ดชำรุด (14FF00)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CSV DATA LOGGER SECTION -->
+      <div class="bg-white dark:bg-darkcard rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">ระบบบันทึกข้อมูล (CSV Data Logger)</h2>
+          <span id="recCounter" class="text-xs font-mono font-semibold text-slate-500">0 รายการ (00:00)</span>
+        </div>
+
+        <div class="flex space-x-2">
+          <button id="recToggleBtn" onclick="toggleLogging()" class="flex-1 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold text-xs shadow hover:opacity-90 active:scale-95 transition flex items-center justify-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+            <span id="recToggleText">เริ่มบันทึก (Start REC)</span>
+          </button>
+
+          <button id="downloadCsvBtn" onclick="downloadCSV()" disabled class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-200 transition">
+            ดาวน์โหลด CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- DEBUG LOG CONSOLE (COLLAPSIBLE) -->
+      <details class="bg-white dark:bg-darkcard rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden group">
+        <summary class="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider cursor-pointer flex items-center justify-between select-none">
+          <span>BLE / KWP2000 Console Log</span>
+          <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div class="px-4 pb-4 space-y-2 border-t border-slate-100 dark:border-slate-800/80 pt-3">
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span id="bleDeviceName">อุปกรณ์: ยังไม่ได้เชื่อมต่อ</span>
+            <div class="space-x-2">
+              <button onclick="clearDebugLog()" class="hover:text-cyan-500">Clear</button>
+              <button onclick="copyDebugLog()" class="hover:text-cyan-500">Copy Log</button>
+            </div>
+          </div>
+          <div id="debugLogConsole" class="h-40 bg-slate-950 text-emerald-400 font-mono text-[10px] p-2.5 rounded-lg overflow-y-auto leading-relaxed custom-scrollbar">
+            [SYS] Ready to connect BLE...
+          </div>
+        </div>
+      </details>
+
+    </div>
   </main>
 
-  <!-- IN-APP CONFIRMATION MODAL (RESET ADAPT & CLEAR DTC) -->
-  <div id="app-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center space-y-4">
-      <div id="modal-icon-bg" class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl font-bold">
-        ⚠️
+  <!-- CONFIRMATION MODAL POPUP -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="modalBox">
+      <div class="flex items-center space-x-3">
+        <div id="modalIcon" class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg font-bold">
+          ⚠️
+        </div>
+        <div>
+          <h3 id="modalTitle" class="text-base font-bold text-slate-900 dark:text-white leading-snug">ยืนยันการทำรายการ</h3>
+          <p id="modalSub" class="text-xs text-slate-400 font-medium">คำเตือนระบบกล่อง PGQ16</p>
+        </div>
       </div>
-      <div>
-        <h3 id="modal-title" class="text-base font-bold text-white">ยืนยันการทำรายการ</h3>
-        <p id="modal-desc" class="text-xs text-slate-400 mt-1">คำสั่งนี้จะส่งไปยัง ECU PGQ16 โดยตรง</p>
-      </div>
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button onclick="closeModal()" class="py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700">
+      <p id="modalBody" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/70 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+        ข้อความยืนยันจะแสดงที่นี่...
+      </p>
+      <div class="flex space-x-2 pt-1">
+        <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 transition">
           ยกเลิก
         </button>
-        <button id="modal-confirm-btn" onclick="executeModalAction()" class="py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-500 shadow-lg">
-          ยืนยันส่งคำสั่ง
+        <button id="modalConfirmBtn" onclick="" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 shadow transition">
+          ยืนยันทำรายการ
         </button>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC & SIMULATION ENGINE -->
+  <!-- JAVASCRIPT: ENGINE & LOGIC -->
   <script>
-    // Global State Container
-    const state = {
-      theme: 1, // 1: Sport Arc, 2: Rider HUD, 3: Italian Cluster
-      page: 1,
-      scenario: 'idle', // 'idle', 'riding', 'fault'
-      isConnected: false,
-      isRecording: false,
-      recordRows: [],
-      recordCount: 0,
-      activeModal: null,
+    /* ==========================================================================
+       GLOBAL STATE & DICTIONARIES
+       ========================================================================== */
+    const DTC_MAP = {
+      'P0505': 'วาล์วเดินเบา IACV ทำงานผิดปกติ',
+      'P0120': 'เซนเซอร์ตำแหน่งลิ้นเร่ง TPS สัญญาณขาด/ช็อต',
+      'P0122': 'เซนเซอร์ TPS แรงดันต่ำกว่าเกณฑ์',
+      'P0123': 'เซนเซอร์ TPS แรงดันสูงกว่าเกณฑ์',
+      'P0115': 'เซนเซอร์อุณหภูมิความร้อน ECT สัญญาณผิดปกติ',
+      'P0117': 'เซนเซอร์ ECT แรงดันต่ำ (เครื่องร้อนจัด/สายช็อต)',
+      'P0118': 'เซนเซอร์ ECT แรงดันสูง (สายขาด)',
+      'P0110': 'เซนเซอร์อุณหภูมิไอดี IAT ขัดข้อง',
+      'P0105': 'เซนเซอร์แรงดันไอดี MAP ขัดข้อง',
+      'P0130': 'ออกซิเจนเซนเซอร์ O2 Sensor ขัดข้อง',
+      'P0135': 'ตัวฮีตเตอร์ออกซิเจนเซนเซอร์ขัดข้อง',
+      'P0201': 'หัวฉีดวงจรขัดข้อง (Injector Fault)',
+      'P0230': 'ปั๊มเชื้อเพลิงขัดข้อง (Fuel Pump Fault)',
+      'P0335': 'เซนเซอร์จานไฟ/เพลาข้อเหวี่ยง CKP Fault',
+      'P0351': 'คอยล์จุดระเบิดขัดข้อง (Ignition Coil)',
+      'P0480': 'พัดลมหม้อน้ำขัดข้อง (Radiator Fan Fault)',
+      'P0500': 'เซนเซอร์วัดความเร็ว Speed Sensor',
+      'P0560': 'ระบบแรงดันไฟกล่อง ECU ขัดข้อง',
+      'P1600': 'ระบบกุญแจอิมโมบิไลเซอร์ Immo ไม่ตรงรหัส'
+    };
 
-      // PGQ16 Live Data Values
-      rpm: 1550,
+    let themeMode = 'auto'; // 'auto' | 'light' | 'dark'
+    let currentTab = 1;
+    let bleDevice = null;
+    let bleServer = null;
+    let rxCharacteristic = null;
+    let txCharacteristic = null;
+    let isConnected = false;
+    let rxBuffer = '';
+    let cmdQueue = [];
+    let isProcessingQueue = false;
+    let pollIntervalTimer = null;
+    let currentCycleIndex = 0;
+
+    // Live Telemetry Data Store
+    const ecuData = {
+      rpm: 0,
       speed: 0,
-      tps: 0.0,
-      iacv: 24,
-      rissStatus: 'RDY', // 'RDY', 'ARM', 'OFF'
-      dtcCode: 'NONE',   // 'NONE', 'P0505'
-      
-      // Extended Telemetry
-      volt: 14.2,
-      ect: 88,
-      iacvAdapt: 129,
-      iacvTarget: 64,
-      ign: 12.5,
-      inj: 2.4,
-      brake: false,
-      idleFlag: '01',
-      iacvDrv: '08',
-      ecuMode: '08'
+      voltage: 0,
+      tpsPct: 0,
+      iacvOut: 0,
+      iacvAdapt: 128,
+      iacvTarget: 0,
+      ect: 0,
+      ignAdv: 0,
+      injTime: 0,
+      tpsIdleSw: 0,
+      rissState: 0,
+      rissSw: 0,
+      brakeSw: 0,
+      engMode: 0,
+      drvErr: 8,
+      dtcList: []
     };
 
-    // Scenarios Setup
-    const scenarios = {
-      idle: { rpm: 1550, speed: 0, tps: 0.0, iacv: 24, rissStatus: 'RDY', dtcCode: 'NONE', volt: 14.2, ect: 88, iacvAdapt: 129, iacvTarget: 64, ign: 12.5, inj: 2.4, iacvDrv: '08' },
-      riding: { rpm: 5400, speed: 68, tps: 42.5, iacv: 48, rissStatus: 'ARM', dtcCode: 'NONE', volt: 13.9, ect: 92, iacvAdapt: 129, iacvTarget: 48, ign: 28.0, inj: 6.8, iacvDrv: '08' },
-      fault: { rpm: 2150, speed: 0, tps: 0.0, iacv: 38, rissStatus: 'OFF', dtcCode: 'P0505', volt: 14.1, ect: 95, iacvAdapt: 145, iacvTarget: 24, ign: 9.0, inj: 3.1, iacvDrv: '84' }
-    };
+    // Data Logger Store
+    let isLogging = false;
+    let logRecords = [];
+    let logStartTime = 0;
+    let logTimerInterval = null;
 
-    // Initialize UI on Load
-    window.addEventListener('DOMContentLoaded', () => {
-      startClock();
-      updateScenarioValues();
-      setInterval(runLiveJitterEngine, 300); // 300ms live numbers jitter
+    /* ==========================================================================
+       THEME MANAGEMENT
+       ========================================================================== */
+    function initTheme() {
+      const saved = localStorage.getItem('pgq16_theme');
+      if (saved) themeMode = saved;
+      applyTheme();
+    }
+
+    function cycleTheme() {
+      if (themeMode === 'auto') themeMode = 'light';
+      else if (themeMode === 'light') themeMode = 'dark';
+      else themeMode = 'auto';
+      localStorage.setItem('pgq16_theme', themeMode);
+      applyTheme();
+    }
+
+    function applyTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+
+      let useDark = false;
+      if (themeMode === 'auto') {
+        useDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        icon.textContent = '🌓';
+        label.textContent = 'Auto';
+      } else if (themeMode === 'light') {
+        useDark = false;
+        icon.textContent = '☀️';
+        label.textContent = 'Bright';
+      } else {
+        useDark = true;
+        icon.textContent = '🌙';
+        label.textContent = 'Dark';
+      }
+
+      if (useDark) {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (themeMode === 'auto') applyTheme();
     });
 
-    // Theme Switcher Logic
-    function setTheme(themeNum) {
-      state.theme = themeNum;
-      
-      // Update top button styles
-      [1, 2, 3].forEach(num => {
-        const btn = document.getElementById(`btn-theme-${num}`);
-        if (num === themeNum) {
-          btn.className = "px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all text-white bg-slate-800 shadow";
-        } else {
-          btn.className = "px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white";
+    /* ==========================================================================
+       TAB SWITCHING & TOUCH SWIPE
+       ========================================================================== */
+    function switchTab(tabNum) {
+      currentTab = tabNum;
+      const t1Btn = document.getElementById('tab1Btn');
+      const t2Btn = document.getElementById('tab2Btn');
+      const p1 = document.getElementById('page1');
+      const p2 = document.getElementById('page2');
+
+      if (tabNum === 1) {
+        p1.classList.remove('hidden');
+        p2.classList.add('hidden');
+        t1Btn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center bg-white dark:bg-darkcard text-cyan-600 dark:text-neoncyan shadow-sm";
+        t2Btn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+      } else {
+        p1.classList.add('hidden');
+        p2.classList.remove('hidden');
+        t2Btn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center bg-white dark:bg-darkcard text-cyan-600 dark:text-neoncyan shadow-sm";
+        t1Btn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+      }
+    }
+
+    // Touch Swipe Handlers for Mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeArea = document.getElementById('swipeArea');
+
+    swipeArea.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    swipeArea.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) > 60) {
+        if (diff < 0 && currentTab === 1) switchTab(2); // Swipe Left
+        if (diff > 0 && currentTab === 2) switchTab(1); // Swipe Right
+      }
+    }
+
+    /* ==========================================================================
+       WEB BLUETOOTH & KWP2000 ENGINE
+       ========================================================================== */
+    const UART_SERVICES = [
+      '0000ffe0-0000-1000-8000-00805f9b34fb',
+      '0000fff0-0000-1000-8000-00805f9b34fb',
+      '0000bee0-0000-1000-8000-00805f9b34fb',
+      '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+      'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
+    ];
+
+    async function toggleBLE() {
+      if (isConnected) {
+        disconnectBLE();
+      } else {
+        await connectBLE();
+      }
+    }
+
+    async function connectBLE() {
+      try {
+        logDebug('[BLE] เปิดหน้าต่างค้นหาอุปกรณ์...');
+        updateStatus('Scanning...', 'bg-amber-500', 'กำลังค้นหาอุปกรณ์ BLE...');
+
+        bleDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: UART_SERVICES
+        });
+
+        document.getElementById('bleDeviceName').textContent = `อุปกรณ์: ${bleDevice.name || 'ELM327 BLE'}`;
+        logDebug(`[BLE] พบอุปกรณ์: ${bleDevice.name} (${bleDevice.id})`);
+
+        bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        bleServer = await bleDevice.gatt.connect();
+        logDebug('[BLE] GATT Connected! กำลังค้นพอร์ตสื่อสาร UART...');
+
+        // Primary UART Discovery Loop
+        let foundService = null;
+        for (const serviceUuid of UART_SERVICES) {
+          try {
+            foundService = await bleServer.getPrimaryService(serviceUuid);
+            if (foundService) {
+              logDebug(`[BLE] พบเป้าหมาย Service: ${serviceUuid}`);
+              break;
+            }
+          } catch(e){}
         }
+
+        if (!foundService) {
+          const services = await bleServer.getPrimaryServices();
+          if (services.length > 0) foundService = services[0];
+        }
+
+        if (!foundService) throw new Error('ไม่พบสเปกพอร์ต UART บนบลูทูธนี้');
+
+        const chars = await foundService.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.notify || c.properties.indicate) {
+            rxCharacteristic = c;
+          }
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            txCharacteristic = c;
+          }
+        }
+
+        if (!rxCharacteristic || !txCharacteristic) {
+          throw new Error('ค้นหาพอร์ตส่ง/รับข้อมูลไม่ครบถ้วน');
+        }
+
+        await rxCharacteristic.startNotifications();
+        rxCharacteristic.addEventListener('characteristicvaluechanged', handleBLEData);
+        logDebug('[BLE] เปิดรับสัญญาณแจ้งเตือน Notification สำเร็จ!');
+
+        isConnected = true;
+        document.getElementById('bleBtnText').textContent = 'ตัดเชื่อมต่อ';
+        updateStatus('Init KWP', 'bg-cyan-500', 'กำลังตั้งค่าโปรโตคอล KWP2000...');
+
+        // Begin ECU Handshake Sequence
+        await initKWP2000();
+
+      } catch (err) {
+        logDebug(`[ERR] การเชื่อมต่อล้มเหลว: ${err.message}`);
+        updateStatus('Disconnected', 'bg-slate-400', 'เชื่อมต่อไม่สำเร็จ');
+        disconnectBLE();
+      }
+    }
+
+    function onDisconnected() {
+      logDebug('[BLE] อุปกรณ์บลูทูธตัดการเชื่อมต่อ');
+      isConnected = false;
+      document.getElementById('bleBtnText').textContent = 'เชื่อมต่อ BLE';
+      updateStatus('Disconnected', 'bg-slate-400', 'ขาดการเชื่อมต่อ');
+      if (pollIntervalTimer) clearInterval(pollIntervalTimer);
+      resetDataDisplay();
+    }
+
+    function disconnectBLE() {
+      if (bleDevice && bleDevice.gatt.connected) {
+        bleDevice.gatt.disconnect();
+      }
+      onDisconnected();
+    }
+
+    function handleBLEData(event) {
+      const value = event.target.value;
+      const decoder = new TextDecoder('utf-8');
+      const text = decoder.decode(value);
+      rxBuffer += text;
+
+      if (rxBuffer.includes('>')) {
+        const response = rxBuffer.replace('>', '').trim();
+        rxBuffer = '';
+        if (activeResolver) {
+          activeResolver(response);
+          activeResolver = null;
+        }
+      }
+    }
+
+    let activeResolver = null;
+
+    function sendATCommand(cmd, timeoutMs = 1500) {
+      return new Promise((resolve, reject) => {
+        if (!txCharacteristic) return reject('No TX Characteristic');
+
+        const timer = setTimeout(() => {
+          activeResolver = null;
+          logDebug(`[TIMEOUT] คำสั่ง ${cmd} ไม่ตอบกลับภายใน ${timeoutMs}ms`);
+          resolve('NO DATA');
+        }, timeoutMs);
+
+        activeResolver = (res) => {
+          clearTimeout(timer);
+          logDebug(`TX: ${cmd} | RX: ${res}`);
+          resolve(res);
+        };
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(cmd + '\r');
+        txCharacteristic.writeValue(data).catch(err => {
+          clearTimeout(timer);
+          activeResolver = null;
+          reject(err);
+        });
       });
-
-      // Toggle containers
-      document.getElementById('style-1-container').classList.toggle('hidden', themeNum !== 1);
-      document.getElementById('style-1-container').classList.toggle('flex', themeNum === 1);
-      
-      document.getElementById('style-2-container').classList.toggle('hidden', themeNum !== 2);
-      document.getElementById('style-2-container').classList.toggle('flex', themeNum === 2);
-      
-      document.getElementById('style-3-container').classList.toggle('hidden', themeNum !== 3);
-      document.getElementById('style-3-container').classList.toggle('flex', themeNum === 3);
-
-      renderAllViews();
     }
 
-    // Scenario Switcher Logic
-    function setScenario(scenKey) {
-      state.scenario = scenKey;
-      
-      // Update button highlights
-      ['idle', 'riding', 'fault'].forEach(key => {
-        const btn = document.getElementById(`scen-${key}`);
-        if (key === scenKey) {
-          btn.classList.add('ring-2', 'ring-white/50');
-        } else {
-          btn.classList.remove('ring-2', 'ring-white/50');
+    /* ==========================================================================
+       PGQ16 KWP2000 INIT & POLLING CYCLE
+       ========================================================================== */
+    async function initKWP2000() {
+      const initCmds = [
+        'ATZ',
+        'ATE0',
+        'ATL0',
+        'ATS1',
+        'ATAL',
+        'ATSP5',        // KWP2000 Fast Init (5-baud / Fast)
+        '0100',
+        'ATH1',         // Turn Headers ON for PGQ16 identification
+        'ATSH C1 33 F1', // Set Target ECU Header
+        '81'            // Start Communication Keyword
+      ];
+
+      for (const cmd of initCmds) {
+        await sendATCommand(cmd, 1200);
+        await new Promise(r => setTimeout(r, 80));
+      }
+
+      updateStatus('PGQ16 Online', 'bg-emerald-500 animate-pulse', 'PGQ16 ECU ออนไลน์แล้ว');
+      logDebug('[SYS] KWP2000 Handshake เสร็จสมบูรณ์ เริ่มเข้าสู่ลูปอ่านค่า live data');
+
+      startPollingLoop();
+    }
+
+    function startPollingLoop() {
+      if (pollIntervalTimer) clearInterval(pollIntervalTimer);
+      pollIntervalTimer = setInterval(pollNextECUGroup, 220);
+    }
+
+    async function pollNextECUGroup() {
+      if (!isConnected || activeResolver) return;
+
+      currentCycleIndex++;
+
+      try {
+        // Priority Group 1: RPM (2106), Rel TPS (0145), Speed (010D)
+        if (currentCycleIndex % 1 === 0) {
+          const resRpm = await sendATCommand('2106');
+          parseKwpResponse('2106', resRpm);
+
+          const resTps = await sendATCommand('0145');
+          parseObdResponse('0145', resTps);
+
+          const resSpd = await sendATCommand('010D');
+          parseObdResponse('010D', resSpd);
         }
-      });
 
-      updateScenarioValues();
+        // Group 2: Battery (2104), IACV Out (2121), IACV Adapt (2120), ECT (0105)
+        if (currentCycleIndex % 2 === 0) {
+          const resBatt = await sendATCommand('2104');
+          parseKwpResponse('2104', resBatt);
+
+          const resIacvOut = await sendATCommand('2121');
+          parseKwpResponse('2121', resIacvOut);
+
+          const resAdapt = await sendATCommand('2120');
+          parseKwpResponse('2120', resAdapt);
+
+          const resEct = await sendATCommand('0105');
+          parseObdResponse('0105', resEct);
+        }
+
+        // Group 3: Secondary Telemetry (211F, 2109, 2108, 2127, 212B, 2130, 212F, 2135, 2119)
+        if (currentCycleIndex % 3 === 0) {
+          const res211F = await sendATCommand('211F');
+          parseKwpResponse('211F', res211F);
+
+          const res2109 = await sendATCommand('2109');
+          parseKwpResponse('2109', res2109);
+
+          const res2108 = await sendATCommand('2108');
+          parseKwpResponse('2108', res2108);
+
+          const res2127 = await sendATCommand('2127');
+          parseKwpResponse('2127', res2127);
+
+          const res212B = await sendATCommand('212B');
+          parseKwpResponse('212B', res212B);
+
+          const res2130 = await sendATCommand('2130');
+          parseKwpResponse('2130', res2130);
+
+          const res212F = await sendATCommand('212F');
+          parseKwpResponse('212F', res212F);
+
+          const res2135 = await sendATCommand('2135');
+          parseKwpResponse('2135', res2135);
+
+          const res2119 = await sendATCommand('2119');
+          parseKwpResponse('2119', res2119);
+        }
+
+        // Group 4: DTC Fault Scan (Periodic)
+        if (currentCycleIndex % 10 === 0) {
+          const resDtc = await sendATCommand('1800FF00');
+          parseDtcResponse(resDtc);
+        }
+
+        // Log record tick
+        if (isLogging) recordCsvRow();
+
+        // Auto Keepalive / Bus Recovery Check
+        if (ecuData.rpm === 0 && currentCycleIndex > 5 && currentCycleIndex % 15 === 0) {
+          logDebug('[RECOVERY] ตรวจพบข้อมูลนิ่ง ส่งคำสั่งปลุก 3E (Tester Present)...');
+          await sendATCommand('3E');
+        }
+
+      } catch (err) {
+        logDebug(`[POLL ERR] ${err.message}`);
+      }
     }
 
-    function updateScenarioValues() {
-      const target = scenarios[state.scenario];
-      state.rpm = target.rpm;
-      state.speed = target.speed;
-      state.tps = target.tps;
-      state.iacv = target.iacv;
-      state.rissStatus = target.rissStatus;
-      state.dtcCode = target.dtcCode;
-      state.volt = target.volt;
-      state.ect = target.ect;
-      state.iacvAdapt = target.iacvAdapt;
-      state.iacvTarget = target.iacvTarget;
-      state.ign = target.ign;
-      state.inj = target.inj;
-      state.iacvDrv = target.iacvDrv;
-
-      renderAllViews();
+    /* ==========================================================================
+       RESPONSE PARSERS
+       ========================================================================== */
+    function cleanHexBytes(raw) {
+      return raw.replace(/SEARCHING\.\.\./g, '')
+                .replace(/BUS INIT\.\.\./g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .split(' ');
     }
 
-    // Live Jitter Simulation (makes gauges feel alive)
-    function runLiveJitterEngine() {
-      if (state.rpm > 0) {
-        const rpmJitter = Math.floor((Math.random() - 0.5) * 35);
-        const voltJitter = ((Math.random() - 0.5) * 0.1).toFixed(1);
-        
-        const currentRpm = Math.max(800, state.rpm + rpmJitter);
-        const currentVolt = (parseFloat(state.volt) + parseFloat(voltJitter)).toFixed(1);
+    function parseKwpResponse(pid, raw) {
+      if (!raw || raw.includes('NO DATA') || raw.includes('ERROR')) return;
+      const bytes = cleanHexBytes(raw);
 
-        renderLiveNumbers(currentRpm, currentVolt);
-
-        // Record CSV sample if recording
-        if (state.isRecording) {
-          recordCsvRow(currentRpm, currentVolt);
+      // KWP2000 Response Header format: 80+len, target, src, 61, pid, bytes...
+      let dataStart = -1;
+      for (let i = 0; i < bytes.length; i++) {
+        if (bytes[i] === '61' && bytes[i+1] === pid.substring(2)) {
+          dataStart = i + 2;
+          break;
         }
       }
-    }
 
-    // Render Data to All Views
-    function renderAllViews() {
-      renderLiveNumbers(state.rpm, state.volt);
-    }
+      if (dataStart === -1) return;
+      const b = bytes.slice(dataStart).map(x => parseInt(x, 16));
 
-    function renderLiveNumbers(liveRpm, liveVolt) {
-      // ---------------- STYLE 1: SPORT ARC ----------------
-      document.getElementById('s1-speed').innerText = state.speed;
-      document.getElementById('s1-rpm').innerText = liveRpm;
-      document.getElementById('s1-tps').innerText = state.tps.toFixed(1);
-      document.getElementById('s1-iacv').innerText = state.iacv;
-      document.getElementById('s1-tps-bar').style.width = `${Math.min(100, state.tps)}%`;
-      document.getElementById('s1-iacv-bar').style.width = `${Math.min(100, (state.iacv / 60) * 100)}%`;
+      switch (pid) {
+        case '2106': // RPM = ((b0 << 8) | b1) / 2
+          if (b.length >= 2) {
+            ecuData.rpm = Math.round(((b[0] << 8) | b[1]) / 2.0);
+            updateRpmDisplay();
+          }
+          break;
 
-      // Calculate SVG Arc Offset (Max 11000 RPM = 0 offset, 0 RPM = 386.4 offset)
-      const maxRpm = 11000;
-      const pct = Math.min(1, liveRpm / maxRpm);
-      const dashOffset = 386.4 - (386.4 * 0.75 * pct);
-      const arcFill = document.getElementById('arc-fill');
-      arcFill.style.strokeDashoffset = dashOffset;
-      arcFill.style.stroke = liveRpm > 9000 ? '#FF2E54' : (liveRpm > 4500 ? '#FFB800' : '#00F0FF');
+        case '2104': // Battery = b0 / 10.0
+          if (b.length >= 1) {
+            ecuData.voltage = (b[0] / 10.0).toFixed(1);
+            updateBatteryDisplay();
+          }
+          break;
 
-      // Style 1 RISS Pill
-      const s1RissBox = document.getElementById('s1-riss-box');
-      const s1RissText = document.getElementById('s1-riss-text');
-      const s1RissDot = document.getElementById('s1-riss-dot');
-      if (state.rissStatus === 'RDY') {
-        s1RissBox.className = "bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-2.5 flex items-center justify-between transition-all";
-        s1RissText.className = "text-xs font-bold text-emerald-300";
-        s1RissText.innerText = "RDY • สแตนด์บายพร้อมดับเครื่อง";
-        s1RissDot.className = "w-3 h-3 rounded-full bg-emerald-400 animate-pulse";
-      } else if (state.rissStatus === 'ARM') {
-        s1RissBox.className = "bg-amber-950/40 border border-amber-500/40 rounded-xl p-2.5 flex items-center justify-between transition-all";
-        s1RissText.className = "text-xs font-bold text-amber-300";
-        s1RissText.innerText = "ARMED • กำลังทำงานเมื่อหยุดรถ";
-        s1RissDot.className = "w-3 h-3 rounded-full bg-amber-400 animate-ping";
-      } else {
-        s1RissBox.className = "bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between transition-all";
-        s1RissText.className = "text-xs font-bold text-slate-400";
-        s1RissText.innerText = "OFF • สวิตช์ถูกปิด / ระบบไม่พร้อม";
-        s1RissDot.className = "w-3 h-3 rounded-full bg-slate-600";
+        case '2121': // IACV Out = b0
+          if (b.length >= 1) {
+            ecuData.iacvOut = b[0];
+            updateIacvOutDisplay();
+          }
+          break;
+
+        case '2120': // IACV Adapt = b0 (Normal ~128)
+          if (b.length >= 1) {
+            ecuData.iacvAdapt = b[0];
+            updateIacvAdaptDisplay();
+          }
+          break;
+
+        case '211F': // IACV Target
+          if (b.length >= 1) {
+            ecuData.iacvTarget = b[0];
+            document.getElementById('t2_iacvTgt').textContent = `${b[0]} (0x${b[0].toString(16).toUpperCase()})`;
+          }
+          break;
+
+        case '2109': // Ignition Advance = b0 / 4.0
+          if (b.length >= 1) {
+            ecuData.ignAdv = (b[0] / 4.0).toFixed(1);
+            document.getElementById('ignValMain').textContent = ecuData.ignAdv;
+            document.getElementById('t2_ign').textContent = `${ecuData.ignAdv} °`;
+          }
+          break;
+
+        case '2108': // Inj Duration = b0 / 10.0
+          if (b.length >= 1) {
+            ecuData.injTime = (b[0] / 10.0).toFixed(1);
+            document.getElementById('t2_inj').textContent = `${ecuData.injTime} ms`;
+          }
+          break;
+
+        case '2127': // TPS Idle Switch (01=CLOSED, 00=OPEN)
+          if (b.length >= 1) {
+            ecuData.tpsIdleSw = b[0];
+            document.getElementById('t2_tpsSw').textContent = (b[0] === 1) ? 'CLOSED (01)' : 'OPEN (00)';
+            updateRissBadge();
+          }
+          break;
+
+        case '212B': // RISS Master State (02=ARMED, 01=OFF)
+          if (b.length >= 1) {
+            ecuData.rissState = b[0];
+            document.getElementById('t2_rissState').textContent = (b[0] === 2) ? 'ARMED (02)' : (b[0] === 1 ? 'OFF (01)' : `0x${b[0].toString(16)}`);
+            updateRissBadge();
+          }
+          break;
+
+        case '2130': // RISS Handlebar Switch (01=ON, 00=OFF)
+          if (b.length >= 1) {
+            ecuData.rissSw = b[0];
+            document.getElementById('t2_rissSw').textContent = (b[0] === 1) ? 'ON (01)' : 'OFF (00)';
+            updateRissBadge();
+          }
+          break;
+
+        case '212F': // Brake Switch (01=BRAKED, 00=FREE)
+          if (b.length >= 1) {
+            ecuData.brakeSw = b[0];
+            document.getElementById('t2_brakeSw').textContent = (b[0] === 1) ? 'BRAKED (01)' : 'FREE (00)';
+          }
+          break;
+
+        case '2135': // Engine Mode (04=STOP, 07=CRANK, 08=RUN)
+          if (b.length >= 1) {
+            ecuData.engMode = b[0];
+            let modeStr = `0x${b[0].toString(16)}`;
+            if (b[0] === 4) modeStr = 'STOP (04)';
+            if (b[0] === 7) modeStr = 'CRANK (07)';
+            if (b[0] === 8) modeStr = 'RUN (08)';
+            document.getElementById('t2_engMode').textContent = modeStr;
+          }
+          break;
+
+        case '2119': // IACV Driver Flag (08=OK, 84=FAULT)
+          if (b.length >= 1) {
+            ecuData.drvErr = b[0];
+            document.getElementById('t2_drvErr').textContent = (b[0] === 8) ? 'OK (0x08)' : `FAULT (0x${b[0].toString(16).toUpperCase()})`;
+            updateDtcBadge();
+          }
+          break;
       }
-
-      // Style 1 DTC Box
-      const s1DtcBox = document.getElementById('s1-dtc-box');
-      const s1DtcText = document.getElementById('s1-dtc-text');
-      const s1DtcIcon = document.getElementById('s1-dtc-icon');
-      if (state.dtcCode === 'NONE') {
-        s1DtcBox.className = "bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between transition-all";
-        s1DtcText.className = "text-xs font-bold text-emerald-400";
-        s1DtcText.innerText = "NONE • ระบบปกติ ไม่พบความผิดปกติ";
-        s1DtcIcon.className = "w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs";
-        s1DtcIcon.innerText = "✓";
-      } else {
-        s1DtcBox.className = "bg-rose-950/80 border-2 border-rose-500 rounded-xl p-2.5 flex items-center justify-between transition-all animate-pulse-dtc";
-        s1DtcText.className = "text-xs font-bold text-rose-300";
-        s1DtcText.innerText = "P0505: IDLE SPEED • วาล์วรอบค้าง";
-        s1DtcIcon.className = "w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center font-bold text-xs";
-        s1DtcIcon.innerText = "!";
-      }
-
-
-      // ---------------- STYLE 2: RIDER HUD ----------------
-      document.getElementById('s2-speed').innerText = state.speed;
-      document.getElementById('s2-rpm').innerText = liveRpm;
-      document.getElementById('s2-tps').innerText = `${state.tps.toFixed(1)}%`;
-      document.getElementById('s2-iacv').innerText = state.iacv;
-      document.getElementById('s2-rpm-bar').style.width = `${Math.min(100, (liveRpm / 9000) * 100)}%`;
-
-      document.getElementById('s2-riss-text').innerText = state.rissStatus === 'RDY' ? 'RDY (พร้อมทำงาน)' : (state.rissStatus === 'ARM' ? 'ARMED (ทำงานอยู่)' : 'OFF (ปิดอยู่)');
-      document.getElementById('s2-dtc-text').innerText = state.dtcCode === 'NONE' ? 'NO ERROR' : 'P0505: IDLE FAULT';
-      document.getElementById('s2-dtc-text').className = state.dtcCode === 'NONE' ? 'text-sm font-black font-mono text-emerald-400' : 'text-sm font-black font-mono text-rose-400 animate-pulse';
-
-
-      // ---------------- STYLE 3: ITALIAN CLUSTER ----------------
-      document.getElementById('s3-speed').innerText = state.speed;
-      document.getElementById('s3-rpm-num').innerText = `${liveRpm} RPM`;
-      document.getElementById('s3-tps').innerText = state.tps.toFixed(1);
-      document.getElementById('s3-iacv').innerText = state.iacv;
-      document.getElementById('s3-rpm-bar').style.width = `${Math.min(100, (liveRpm / 10000) * 100)}%`;
-
-      document.getElementById('s3-riss-text').innerText = state.rissStatus;
-      document.getElementById('s3-dtc-text').innerText = state.dtcCode === 'NONE' ? 'NO P-CODE' : 'P0505 FAULT';
-      document.getElementById('s3-dtc-text').className = state.dtcCode === 'NONE' ? 'text-xs font-bold text-emerald-400 truncate' : 'text-xs font-bold text-rose-400 truncate animate-pulse';
-
-
-      // ---------------- PAGE 2: TELEMETRY GRID ----------------
-      document.getElementById('p2-volt').innerText = `${liveVolt} V`;
-      document.getElementById('p2-ect').innerText = `${state.ect} °C`;
-      document.getElementById('p2-iacv-adapt').innerText = `${state.iacvAdapt} (+1)`;
-      document.getElementById('p2-iacv-target').innerText = `${state.iacvTarget} steps`;
-      document.getElementById('p2-ign').innerText = `${state.ign}°`;
-      document.getElementById('p2-inj').innerText = `${state.inj} ms`;
-      document.getElementById('p2-iacv-drv').innerText = state.iacvDrv === '08' ? '08 (ปกติ)' : '84 (ผิดปกติ)';
     }
 
-    // Scroll to Page via Navigation Tabs
-    function scrollToPage(pageNum) {
-      state.page = pageNum;
-      const viewport = document.getElementById('app-viewport');
-      const targetPage = document.getElementById(`page-${pageNum}`);
+    function parseObdResponse(pid, raw) {
+      if (!raw || raw.includes('NO DATA') || raw.includes('ERROR')) return;
+      const bytes = cleanHexBytes(raw);
       
-      targetPage.scrollIntoView({ behavior: 'smooth' });
+      let dataStart = -1;
+      for (let i = 0; i < bytes.length; i++) {
+        if (bytes[i] === '41' && bytes[i+1] === pid.substring(2)) {
+          dataStart = i + 2;
+          break;
+        }
+      }
 
-      // Highlight Tabs
-      const tab1 = document.getElementById('tab-page-1');
-      const tab2 = document.getElementById('tab-page-2');
+      if (dataStart === -1) return;
+      const b = bytes.slice(dataStart).map(x => parseInt(x, 16));
 
-      if (pageNum === 1) {
-        tab1.className = "px-4 py-1.5 rounded-full text-xs font-medium text-white bg-brand-cyan/20 border border-brand-cyan/40 shadow transition";
-        tab2.className = "px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition";
-      } else {
-        tab2.className = "px-4 py-1.5 rounded-full text-xs font-medium text-white bg-brand-cyan/20 border border-brand-cyan/40 shadow transition";
-        tab1.className = "px-4 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white transition";
+      if (pid === '010D' && b.length >= 1) {
+        ecuData.speed = b[0];
+        document.getElementById('speedVal').textContent = b[0];
+      }
+
+      if (pid === '0145' && b.length >= 1) {
+        ecuData.tpsPct = Math.round((b[0] * 100) / 255.0);
+        document.getElementById('tpsVal').textContent = `${ecuData.tpsPct} %`;
+        document.getElementById('tpsBar').style.width = `${ecuData.tpsPct}%`;
+      }
+
+      if (pid === '0105' && b.length >= 1) {
+        ecuData.ect = b[0] - 40;
+        document.getElementById('ectValMain').textContent = ecuData.ect;
+        document.getElementById('t2_ect').textContent = `${ecuData.ect} °C`;
+        updateRissBadge();
       }
     }
 
-    // Modal Operations
-    function openModal(actionType) {
-      state.activeModal = actionType;
-      const modal = document.getElementById('app-modal');
-      const title = document.getElementById('modal-title');
-      const desc = document.getElementById('modal-desc');
-      const iconBg = document.getElementById('modal-icon-bg');
-      const confirmBtn = document.getElementById('modal-confirm-btn');
+    function parseDtcResponse(raw) {
+      if (!raw || raw.includes('NO DATA')) return;
+      const bytes = cleanHexBytes(raw);
 
-      if (actionType === 'reset-adapt') {
-        title.innerText = "ยืนยัน RESET ADAPT (300200)";
-        desc.innerText = "ล้างค่าเรียนรู้รอบเดินเบา IACV สั่งให้ ECU เรียนรู้ตำแหน่งใหม่";
-        iconBg.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl font-bold bg-blue-500/20 text-blue-400 border border-blue-500/40";
-        confirmBtn.className = "py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-500 shadow-lg";
-      } else if (actionType === 'clear-dtc') {
-        title.innerText = "ยืนยัน CLEAR DTC (14FF00)";
-        desc.innerText = "ลบประวัติรหัสข้อผิดพลาด P-Code ออกจากกล่อง PGQ16";
-        iconBg.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
-        confirmBtn.className = "py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-500 shadow-lg";
+      ecuData.dtcList = [];
+      for (let i = 0; i < bytes.length - 1; i++) {
+        if (bytes[i] === '58') { // KWP Read DTC Service Response
+          const cnt = parseInt(bytes[i+1], 16);
+          let p = i + 2;
+          for (let c = 0; c < cnt; c++) {
+            if (p + 1 < bytes.length) {
+              const b1 = parseInt(bytes[p], 16);
+              const b2 = parseInt(bytes[p+1], 16);
+              const codeNum = ((b1 << 8) | b2).toString(16).padStart(4, '0').toUpperCase();
+              const pCode = `P${codeNum}`;
+              ecuData.dtcList.push(pCode);
+              p += 3;
+            }
+          }
+        }
+      }
+      updateDtcBadge();
+    }
+
+    /* ==========================================================================
+       UI UPDATERS & METRIC COMPUTATIONS
+       ========================================================================== */
+    function updateRpmDisplay() {
+      const rpm = ecuData.rpm;
+      document.getElementById('rpmVal').textContent = rpm;
+
+      // SVG Arc Calculation (330 max dashoffset for 0-9000 RPM)
+      const maxRpm = 9000;
+      const clampedRpm = Math.min(Math.max(rpm, 0), maxRpm);
+      const strokePercent = clampedRpm / maxRpm;
+      const dashOffset = 330 - (330 * strokePercent);
+
+      const path = document.getElementById('rpmArcPath');
+      path.style.strokeDashoffset = dashOffset;
+
+      const badge = document.getElementById('rpmBadge');
+
+      // Color Coding Rules
+      if (rpm < 1350) {
+        path.setAttribute('stroke', '#00F0FF'); // Blue / Cyan
+        badge.className = "mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400";
+        badge.textContent = "WARMUP / LOW";
+      } else if (rpm >= 1350 && rpm <= 1750) {
+        path.setAttribute('stroke', '#00FF66'); // Green (Idle Zone)
+        badge.className = "mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+        badge.textContent = "IDLE OK (1350-1750)";
+      } else if (rpm > 1750 && rpm <= 2200) {
+        path.setAttribute('stroke', '#FFB800'); // Amber
+        badge.className = "mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400";
+        badge.textContent = "HIGH IDLE";
+      } else {
+        path.setAttribute('stroke', '#FF2A6D'); // Red
+        badge.className = "mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400 animate-pulse";
+        badge.textContent = "REV / CRUISE";
+      }
+    }
+
+    function updateBatteryDisplay() {
+      const v = parseFloat(ecuData.voltage);
+      const valEl = document.getElementById('battVal');
+      const dot = document.getElementById('battDot');
+      const sub = document.getElementById('battSubText');
+
+      valEl.textContent = ecuData.voltage;
+
+      if (v >= 12.6 && v <= 14.6) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm";
+        sub.textContent = "ปกติ (12.6V - 14.6V)";
+        sub.className = "text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5";
+      } else if (v < 12.0) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+        sub.textContent = "แรงดันไฟต่ำมาก (<12.0V)";
+        sub.className = "text-[10px] font-semibold text-red-500 mt-0.5";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+        sub.textContent = "เฝ้าระวังแรงดันไฟ";
+        sub.className = "text-[10px] font-semibold text-amber-500 mt-0.5";
+      }
+    }
+
+    function updateIacvOutDisplay() {
+      const val = ecuData.iacvOut;
+      const pct = Math.min(Math.round((val / 100.0) * 100), 100);
+      document.getElementById('iacvOutVal').textContent = `${val} (0x${val.toString(16).toUpperCase()})`;
+      document.getElementById('iacvOutBar').style.width = `${pct}%`;
+    }
+
+    function updateIacvAdaptDisplay() {
+      const adapt = ecuData.iacvAdapt;
+      const offset = adapt - 128;
+      const offsetStr = offset >= 0 ? `+${offset}` : `${offset}`;
+
+      const valEl = document.getElementById('adaptVal');
+      const dot = document.getElementById('adaptDot');
+      const sub = document.getElementById('adaptSubText');
+
+      valEl.textContent = `${adapt} (${offsetStr})`;
+
+      if (Math.abs(offset) <= 15) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+        sub.textContent = "สมบูรณ์ (ปกติ 128 ±15)";
+        sub.className = "text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
+        sub.textContent = "ค่าเบี่ยงเบนสูง ควร Reset Adapt";
+        sub.className = "text-[10px] font-semibold text-amber-500 mt-0.5";
+      }
+    }
+
+    function updateRissBadge() {
+      const bg = document.getElementById('rissIconBg');
+      const text = document.getElementById('rissText');
+
+      const isSwOn = (ecuData.rissSw === 1);
+      const isArmed = (ecuData.rissState === 2);
+      const isEctWarm = (ecuData.ect >= 80);
+      const isThrottleClosed = (ecuData.tpsIdleSw === 1);
+      const isIdleRpm = (ecuData.rpm > 1200 && ecuData.rpm < 1750);
+
+      if (!isSwOn || ecuData.rissState === 1) {
+        bg.className = "w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs shrink-0";
+        bg.textContent = "OFF";
+        text.textContent = "RISS: ปิดใช้งาน";
+        text.className = "text-xs font-extrabold text-slate-500 truncate block";
+      } else if (isArmed && isEctWarm && isThrottleClosed && isIdleRpm) {
+        bg.className = "w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold text-xs shrink-0 animate-pulse";
+        bg.textContent = "RDY";
+        text.textContent = "RISS: พร้อมดับเครื่อง";
+        text.className = "text-xs font-extrabold text-emerald-600 dark:text-emerald-400 truncate block";
+      } else {
+        bg.className = "w-9 h-9 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-xs shrink-0";
+        bg.textContent = "ARM";
+        text.textContent = "RISS: สแตนด์บาย";
+        text.className = "text-xs font-extrabold text-amber-600 dark:text-amber-400 truncate block";
+      }
+    }
+
+    function updateDtcBadge() {
+      const bg = document.getElementById('dtcIconBg');
+      const text = document.getElementById('dtcText');
+
+      if (ecuData.drvErr !== 8 && ecuData.drvErr !== 0) {
+        bg.className = "w-9 h-9 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-xs shrink-0";
+        bg.textContent = "ERR";
+        text.textContent = `IACV-DRV (${ecuData.drvErr.toString(16)})`;
+        text.className = "text-xs font-extrabold text-amber-600 dark:text-amber-400 truncate block";
+        return;
       }
 
-      modal.classList.remove('hidden');
+      if (ecuData.dtcList.length > 0) {
+        const firstCode = ecuData.dtcList[0];
+        const desc = DTC_MAP[firstCode] || 'พบรหัสข้อผิดพลาด';
+        bg.className = "w-9 h-9 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs shrink-0 animate-bounce";
+        bg.textContent = "DTC";
+        text.textContent = `${firstCode}: ${desc}`;
+        text.className = "text-xs font-extrabold text-red-600 dark:text-red-400 truncate block";
+      } else {
+        bg.className = "w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-xs shrink-0";
+        bg.textContent = "OK";
+        text.textContent = "DTC: NONE (ปกติ)";
+        text.className = "text-xs font-extrabold text-emerald-600 dark:text-emerald-400 truncate block";
+      }
+    }
+
+    function updateStatus(pillText, dotClass, subText) {
+      document.getElementById('statusText').textContent = subText;
+      const dot = document.getElementById('statusDot');
+      dot.className = `w-3 h-3 rounded-full ${dotClass}`;
+    }
+
+    function resetDataDisplay() {
+      ecuData.rpm = 0;
+      ecuData.speed = 0;
+      ecuData.voltage = 0;
+      updateRpmDisplay();
+      document.getElementById('speedVal').textContent = '0';
+      document.getElementById('battVal').textContent = '--';
+      document.getElementById('adaptVal').textContent = '--';
+      document.getElementById('tpsVal').textContent = '0 %';
+      document.getElementById('tpsBar').style.width = '0%';
+      document.getElementById('iacvOutVal').textContent = '0 (0x00)';
+      document.getElementById('iacvOutBar').style.width = '0%';
+    }
+
+    /* ==========================================================================
+       ECU CONTROL COMMAND MODALS
+       ========================================================================== */
+    function promptResetAdapt() {
+      openModal(
+        '🔄',
+        'bg-amber-500/20 text-amber-500',
+        'ล้างค่าเรียนรู้รอบเดินเบา (Reset Adapt)',
+        'คำสั่ง KWP2000: 300200',
+        'คำเตือน: โปรดทำรายการขณะเปิดสวิตช์กุญแจ (ON) โดย **ยังไม่สตาร์ตเครื่องยนต์** หลังจากกดล้างค่าแล้ว ให้บิดกุญแจ OFF รอ 15-20 วินาที เพื่อให้กล่อง PGQ16 บันทึกตำแหน่ง IACV เริ่มต้นใหม่',
+        'ยืนยัน Reset Adapt',
+        'bg-amber-600 hover:bg-amber-700',
+        executeResetAdapt
+      );
+    }
+
+    async function executeResetAdapt() {
+      closeModal();
+      logDebug('[CMD] กำลังส่งคำสั่ง Reset Adapt (300200)...');
+      try {
+        await sendATCommand('ATH1');
+        await sendATCommand('ATSH C1 33 F1');
+        await sendATCommand('81');
+        const res = await sendATCommand('300200', 3000);
+        logDebug(`[CMD RESP] Reset Adapt Result: ${res}`);
+        alert('ส่งคำสั่ง Reset Adapt สำเร็จ! โปรดดับกุญแจ OFF ไว้ 15-20 วินาที');
+      } catch (err) {
+        logDebug(`[CMD ERR] ${err.message}`);
+      }
+    }
+
+    function promptClearDTC() {
+      openModal(
+        '🧹',
+        'bg-red-500/20 text-red-500',
+        'ลบล้างรหัสความผิดปกติ (Clear DTC)',
+        'คำสั่ง KWP2000: 14FF00',
+        'คำเตือน: การลบโค้ดจะล้างประวัติข้อผิดพลาดทั้งหมดในหน่วยความจำกล่อง ECU หากปัญหากลไกหรือสายไฟยังไม่ได้รับการแก้ไข รหัสชำรุดจะกลับมาแสดงอีกครั้งหลังการสตาร์ตเครื่อง',
+        'ลบโค้ดทันที',
+        'bg-red-600 hover:bg-red-700',
+        executeClearDTC
+      );
+    }
+
+    async function executeClearDTC() {
+      closeModal();
+      logDebug('[CMD] กำลังส่งคำสั่ง Clear DTC (14FF00)...');
+      try {
+        await sendATCommand('ATH1');
+        await sendATCommand('ATSH C1 33 F1');
+        await sendATCommand('14FF00', 3000);
+        await sendATCommand('ATH0');
+        await sendATCommand('04', 2000);
+        logDebug('[CMD RESP] Clear DTC สำเร็จ สั่งสแกนโค้ดรอบใหม่...');
+        ecuData.dtcList = [];
+        updateDtcBadge();
+      } catch (err) {
+        logDebug(`[CMD ERR] ${err.message}`);
+      }
+    }
+
+    function openModal(icon, iconClass, title, sub, body, confirmText, confirmBtnClass, actionFn) {
+      document.getElementById('modalIcon').textContent = icon;
+      document.getElementById('modalIcon').className = `w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg font-bold ${iconClass}`;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalSub').textContent = sub;
+      document.getElementById('modalBody').textContent = body;
+      
+      const cBtn = document.getElementById('modalConfirmBtn');
+      cBtn.textContent = confirmText;
+      cBtn.className = `flex-1 py-2.5 rounded-xl text-white font-bold text-xs shadow transition ${confirmBtnClass}`;
+      cBtn.onclick = actionFn;
+
+      const overlay = document.getElementById('modalOverlay');
+      const box = document.getElementById('modalBox');
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+        box.classList.remove('scale-95');
+      }, 10);
     }
 
     function closeModal() {
-      document.getElementById('app-modal').classList.add('hidden');
-      state.activeModal = null;
+      const overlay = document.getElementById('modalOverlay');
+      const box = document.getElementById('modalBox');
+      overlay.classList.add('opacity-0');
+      box.classList.add('scale-95');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 200);
     }
 
-    function executeModalAction() {
-      if (state.activeModal === 'clear-dtc') {
-        state.dtcCode = 'NONE';
-        if (state.scenario === 'fault') {
-          state.scenario = 'idle';
-          setScenario('idle');
-        }
-        renderAllViews();
-        showToast("ส่งคำสั่ง CLEAR DTC (14FF00) สำเร็จ!");
-      } else if (state.activeModal === 'reset-adapt') {
-        state.iacvAdapt = 128;
-        renderAllViews();
-        showToast("ส่งคำสั่ง RESET ADAPT (300200) สำเร็จ!");
-      }
-      closeModal();
-    }
+    /* ==========================================================================
+       CSV DATA LOGGER ENGINE
+       ========================================================================== */
+    function toggleLogging() {
+      isLogging = !isLogging;
+      const recBadge = document.getElementById('recBadge');
+      const btnText = document.getElementById('recToggleText');
+      const dlBtn = document.getElementById('downloadCsvBtn');
 
-    // CSV Log Recorder
-    function toggleCSVRecord() {
-      state.isRecording = !state.isRecording;
-      const recBtn = document.getElementById('btn-log-record');
-      const recText = document.getElementById('btn-log-text');
-      const recIndicator = document.getElementById('rec-indicator');
+      if (isLogging) {
+        logRecords = [];
+        logStartTime = Date.now();
+        recBadge.classList.remove('hidden');
+        recBadge.classList.add('flex');
+        btnText.textContent = 'หยุดบันทึก (Stop REC)';
+        dlBtn.disabled = true;
 
-      if (state.isRecording) {
-        state.recordRows = [["Timestamp", "RPM", "Speed_kmh", "TPS_pct", "IACV_steps", "Volt_V", "ECT_C", "DTC"]];
-        state.recordCount = 0;
-        recBtn.className = "w-full py-2.5 px-3 bg-rose-600 text-white rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition shadow-lg animate-pulse";
-        recText.innerText = "หยุดบันทึก & โหลด CSV";
-        recIndicator.classList.remove('hidden');
+        logTimerInterval = setInterval(() => {
+          const elapsedSec = Math.floor((Date.now() - logStartTime) / 1000);
+          const m = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+          const s = String(elapsedSec % 60).padStart(2, '0');
+          document.getElementById('recCounter').textContent = `${logRecords.length} รายการ (${m}:${s})`;
+        }, 1000);
+
+        logDebug('[LOGGER] เริ่มการบันทึก telemetry ลงไฟล์ CSV');
       } else {
-        recBtn.className = "w-full py-2.5 px-3 bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition";
-        recText.innerText = "บันทึก Log (CSV)";
-        recIndicator.classList.add('hidden');
-        downloadCsvFile();
+        recBadge.classList.add('hidden');
+        recBadge.classList.remove('flex');
+        btnText.textContent = 'เริ่มบันทึก (Start REC)';
+        if (logTimerInterval) clearInterval(logTimerInterval);
+        dlBtn.disabled = logRecords.length === 0;
+        logDebug(`[LOGGER] หยุดการบันทึก รวมทั้งสิ้น ${logRecords.length} แถว`);
       }
     }
 
-    function recordCsvRow(liveRpm, liveVolt) {
-      state.recordCount++;
-      const timeStr = new Date().toISOString().split('T')[1].slice(0, 8);
-      state.recordRows.push([timeStr, liveRpm, state.speed, state.tps, state.iacv, liveVolt, state.ect, state.dtcCode]);
-      document.getElementById('rec-count').innerText = `REC ${state.recordCount}`;
+    function recordCsvRow() {
+      const t = ((Date.now() - logStartTime) / 1000).toFixed(2);
+      const dtcStr = ecuData.dtcList.join(';') || 'NONE';
+      const row = [
+        t,
+        ecuData.voltage,
+        ecuData.rpm,
+        ecuData.speed,
+        ecuData.ect,
+        ecuData.tpsPct,
+        ecuData.iacvOut,
+        ecuData.iacvAdapt,
+        ecuData.iacvTarget,
+        ecuData.injTime,
+        ecuData.ignAdv,
+        ecuData.tpsIdleSw,
+        ecuData.rissState,
+        ecuData.rissSw,
+        ecuData.brakeSw,
+        ecuData.engMode,
+        ecuData.drvErr,
+        `"${dtcStr}"`
+      ].join(',');
+
+      logRecords.push(row);
     }
 
-    function downloadCsvFile() {
-      if (state.recordRows.length <= 1) return;
-      let csvContent = "data:text/csv;charset=utf-8," + state.recordRows.map(e => e.join(",")).join("\n");
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `medley_pgq16_log_${Date.now()}.csv`);
+    function downloadCSV() {
+      if (logRecords.length === 0) return;
+
+      const header = 'Time_s,ECU_V,RPM_2106,Speed_kmh,ECT_C,Rel_TPS_Pct,IACV_Out_2121,IACV_Int_2120,IACV_Tgt_211F,Inj_ms_2108,Ign_deg_2109,IdleFlag_2127,RISS_State_212B,RISS_Sw_2130,Brake_212F,Mode_2135,DrvErr_2119,DTC_Status\n';
+      const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(header + logRecords.join('\n'));
+      
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
+      const timeStr = now.toTimeString().slice(0,8).replace(/:/g,'');
+      const filename = `PGQ16_${dateStr}_${timeStr}.csv`;
+
+      const link = document.createElement('a');
+      link.setAttribute('href', csvContent);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`ดาวน์โหลดไฟล์ Log CSV เรียบร้อย (${state.recordCount} แถว)`);
     }
 
-    // Bluetooth Connect Simulation / Web Bluetooth Entry point
-    async function toggleBluetoothConnection() {
-      const btnText = document.getElementById('btn-ble-text');
-      const connBadge = document.getElementById('top-conn-badge');
-      const bleDot = document.getElementById('ble-status-dot');
+    /* ==========================================================================
+       DEBUG CONSOLE UTILS
+       ========================================================================== */
+    function logDebug(msg) {
+      const consoleEl = document.getElementById('debugLogConsole');
+      const time = new Date().toTimeString().slice(0, 8);
+      const line = document.createElement('div');
+      line.textContent = `[${time}] ${msg}`;
+      consoleEl.appendChild(line);
 
-      if (!state.isConnected) {
-        if (navigator.bluetooth) {
-          try {
-            // Real Web Bluetooth API Request Stub
-            showToast("กำลังค้นหาอุปกรณ์ ELM327 BLE...");
-            const device = await navigator.bluetooth.requestDevice({
-              acceptAllDevices: true,
-              optionalServices: ['0000fff0-0000-1000-8000-00805f9b34fb']
-            });
-            showToast(`เชื่อมต่อกับ ${device.name} แล้ว!`);
-            setBleConnectedState(true);
-          } catch (err) {
-            showToast("เข้าสู่โหมดจำลองสัญญาณ (Simulator)");
-            setBleConnectedState(true);
-          }
-        } else {
-          // Fallback to Simulation Mode for Non-WebBluetooth Browsers
-          showToast("เปิดใช้งานโหมดจำลอง Bluetooth BLE");
-          setBleConnectedState(true);
-        }
-      } else {
-        setBleConnectedState(false);
-        showToast("ตัดการเชื่อมต่อ Bluetooth แล้ว");
+      // Keep max 50 items
+      while (consoleEl.childNodes.length > 50) {
+        consoleEl.removeChild(consoleEl.firstChild);
       }
+      consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 
-    function setBleConnectedState(connected) {
-      state.isConnected = connected;
-      const btnText = document.getElementById('btn-ble-text');
-      const connBadge = document.getElementById('top-conn-badge');
-      const bleDot = document.getElementById('ble-status-dot');
-      const bleStatusText = document.getElementById('ble-status-text');
-
-      if (connected) {
-        btnText.innerText = "ตัดการเชื่อมต่อ BLE";
-        connBadge.className = "text-xs px-2.5 py-1 rounded-full font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
-        connBadge.innerText = "CONNECTED • BLE";
-        bleDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
-        bleStatusText.innerText = "ELM327 BLE • CONNECTED";
-      } else {
-        btnText.innerText = "เชื่อมต่อ ELM327 BLE";
-        connBadge.className = "text-xs px-2.5 py-1 rounded-full font-mono bg-amber-500/10 text-amber-400 border border-amber-500/30";
-        connBadge.innerText = "SIMULATOR";
-        bleDot.className = "w-2 h-2 rounded-full bg-amber-400";
-        bleStatusText.innerText = "ELM327 BLE • DISCONNECTED";
-      }
+    function clearDebugLog() {
+      document.getElementById('debugLogConsole').innerHTML = '';
     }
 
-    // Utility: Simple Toast Notification
-    function showToast(msg) {
-      const toast = document.createElement('div');
-      toast.className = "fixed bottom-16 z-50 bg-slate-900 border border-slate-700 text-white text-xs px-4 py-2 rounded-full shadow-2xl animate-bounce";
-      toast.innerText = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+    function copyDebugLog() {
+      const text = document.getElementById('debugLogConsole').innerText;
+      const dummy = document.createElement('textarea');
+      document.body.appendChild(dummy);
+      dummy.value = text;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+      alert('คัดลอก Debug Log เรียบร้อยแล้ว!');
     }
 
-    // Utility: Real-Time Clock
-    function startClock() {
-      const clock = document.getElementById('clock-display');
-      const update = () => {
-        const d = new Date();
-        clock.innerText = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-      };
-      update();
-      setInterval(update, 10000);
-    }
+    /* ==========================================================================
+       ONLOAD INITIALIZATION
+       ========================================================================== */
+    window.onload = function() {
+      initTheme();
+      updateRpmDisplay();
+      logDebug('[SYS] เว็บแอปพร้อมใช้งาน - กรุณากดเชื่อมต่อ BLE บน Bluefy / Chrome');
+    };
   </script>
 </body>
 </html>
